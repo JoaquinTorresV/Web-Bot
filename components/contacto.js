@@ -1,93 +1,81 @@
-'use client'; // Este es el uso para habilitar la ejecución del código del cliente
+'use client';
 
 import { useState } from 'react';
-import emailjs from '@emailjs/browser'; // Esto es correcto
-// Importar la librería de EmailJS
+import emailjs from '@emailjs/browser';
 
 export default function Contacto() {
-  // Estados para manejar el correo, fecha y el estado de carga
-  const [email, setEmail] = useState(''); // Correo del cliente ingresado
-  const [savedEmail, setSavedEmail] = useState(null); // Correo guardado
-  const [loading, setLoading] = useState(false); // Estado de carga
-  const [date, setDate] = useState(''); // Fecha seleccionada para la reunión
+  const [email, setEmail] = useState('');
+  const [savedEmail, setSavedEmail] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [date, setDate] = useState('');
 
-  // Función para manejar el cambio de correo
+  // Obtener las claves desde variables de entorno
+  const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+  const TEMPLATE_ID_CLIENT = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_CLIENT;
+  const TEMPLATE_ID_ADMIN = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ADMIN;
+  const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
 
-  // Función para guardar el correo
   const handleSaveEmail = () => {
     if (email) {
-      setSavedEmail(email); // Guardar el correo en el estado
+      setSavedEmail(email);
       alert('Correo guardado exitosamente');
     } else {
       alert('Por favor, ingrese un correo válido');
     }
   };
 
-  // Función para manejar el envío de los correos
   const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true); // Activar el estado de carga
+    setLoading(true);
 
-    // Validar que el correo ha sido guardado
     if (!savedEmail) {
       alert('Por favor, guarda tu correo primero.');
       setLoading(false);
       return;
     }
 
-    // Enviar el correo al cliente (confirmación)
+    // Enviar correo al cliente
     emailjs
       .send(
-        'service_sfqizso', // Service ID de EmailJS
-        'template_uvq2eya', // Template ID para el cliente
-        {
-          to_email: savedEmail, // Correo del cliente
-          from_email: 'joaquintorresv2005@gmail.com', // Correo del administrador
-          date: date, // Fecha seleccionada para la reunión
-        },
-        'KBx7VrI_K1DE2JP0s' // Public Key (User ID de EmailJS)
+        SERVICE_ID,
+        TEMPLATE_ID_CLIENT,
+        { to_email: savedEmail, from_email: 'joaquintorresv2005@gmail.com', date },
+        PUBLIC_KEY
       )
-      .then(
-        (result) => {
-          console.log('Correo al cliente enviado correctamente', result);
-        },
-        (error) => {
-          console.log('Error al enviar correo al cliente', error.text);
-          alert('Error al enviar correo al cliente: ' + error.text);
-        }
-      );
+      .then(() => {
+        console.log('Correo al cliente enviado correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al enviar correo al cliente', error);
+        alert('Error al enviar correo al cliente.');
+      });
 
-    // Enviar el correo al administrador (notificación)
+    // Enviar correo al administrador
     emailjs
       .send(
-        'service_sfqizso', // Service ID de EmailJS
-        'template_ggxbjf6', // Template ID para el administrador
-        {
-          to_email: 'joaquintorresv2005@gmail.com', // Correo del administrador
-          from_email: savedEmail, // Correo del cliente (para confirmación)
-          date: date, // Fecha seleccionada
-        },
-        'KBx7VrI_K1DE2JP0s' // Public Key (User ID de EmailJS)
+        SERVICE_ID,
+        TEMPLATE_ID_ADMIN,
+        { to_email: 'joaquintorresv2005@gmail.com', from_email: savedEmail, date },
+        PUBLIC_KEY
       )
-      .then(
-        (result) => {
-          console.log('Correo al administrador enviado correctamente', result);
-          setLoading(false); // Desactivar el estado de carga
-          alert('¡Reunión agendada exitosamente! Te confirmaremos por correo.');
-        },
-        (error) => {
-          console.log('Error al enviar correo al administrador', error.text);
-          setLoading(false); // Desactivar el estado de carga
-          alert('Hubo un error al enviar el correo. Por favor, inténtalo de nuevo.');
-        }
-      );
+      .then(() => {
+        console.log('Correo al administrador enviado correctamente');
+        setLoading(false);
+        alert('¡Reunión agendada exitosamente! Te confirmaremos por correo.');
+      })
+      .catch((error) => {
+        console.error('Error al enviar correo al administrador', error);
+        setLoading(false);
+        alert('Hubo un error al enviar el correo.');
+      });
   };
 
   return (
-    <div className="max-w-xl mx-auto p-4" id='contacto'>
+    <div className="max-w-xl mx-auto p-4" id="contacto">
       <h2 className="text-3xl font-bold text-center mb-4">Agendar Reunión</h2>
 
       {/* Formulario de correo */}

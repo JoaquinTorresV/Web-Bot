@@ -18,3 +18,4 @@ export default function ButtonCheckout({priceId} ) {
         Comprar</button>
   )
 }
+  
