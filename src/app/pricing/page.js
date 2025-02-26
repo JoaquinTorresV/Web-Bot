@@ -2,6 +2,7 @@ import { Stripe } from "stripe";
 import ButtonCheckout from "../../../components/ButtonCheckout";
 import Link from "next/link";
 
+// Función para cargar los precios de Stripe
 async function LoadPrices() {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const prices = await stripe.prices.list();
@@ -19,15 +20,22 @@ async function LoadPrices() {
     })
   );
 
-  // Ordenamos los productos de menor a mayor precio
+  // Ordena los precios de menor a mayor
   pricesWithProduct.sort((a, b) => a.unit_amount - b.unit_amount);
-
   return pricesWithProduct;
 }
 
-async function PricingPage() {
+// Usar getServerSideProps para cargar los datos del lado del servidor
+export async function getServerSideProps() {
   const prices = await LoadPrices();
+  return {
+    props: {
+      prices,
+    },
+  };
+}
 
+function PricingPage({ prices }) {
   return (
     <div className="flex flex-col items-center justify-center h-screen p-8 bg-gray-50 text-black">
       <header className="text-center mb-8">
@@ -41,11 +49,7 @@ async function PricingPage() {
             <p className="text-lg font-medium text-gray-800 mb-6">
               {price.unit_amount / 100} {price.currency.toUpperCase()}
             </p>
-            {/* Botón de compra más destacado */}
-            <ButtonCheckout 
-              priceId={price.id} 
-              className="px-10 py-5 bg-green-800 text-white text-xl font-bold rounded-lg shadow-xl hover:bg-green-800 transition duration-300 transform hover:scale-110 border-2 border-green-700"
-            />
+            <ButtonCheckout priceId={price.id} className="px-10 py-5 bg-green-600 text-white text-xl font-bold rounded-lg shadow-xl hover:bg-green-800 transition duration-300 transform hover:scale-110 border-2 border-green-700" />
           </div>
         ))}
       </div>
