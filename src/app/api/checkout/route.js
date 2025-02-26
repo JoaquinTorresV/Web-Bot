@@ -16,8 +16,8 @@ export async function POST(request){
                 quantity: 1
             }
         ],
-        success_url: 'http://localhost:3000/success',
-        cancel_url: 'http://localhost:3000/pricing'
+        success_url: 'https://web-hluwfnavl-01alogs-projects.vercel.app/success',
+        cancel_url: 'https://web-hluwfnavl-01alogs-projects.vercel.app/pricing'
     })
 
     console.log(session)
